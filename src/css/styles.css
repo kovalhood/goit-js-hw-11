@@ -31,6 +31,13 @@ img {
   display: block;
   max-width: 100%;
   height: auto;
+
+  opacity: 0;
+  transition: opacity 300ms ease-in-out;
+}
+
+img.loaded {
+  opacity: 1;
 }
 
 .section {
@@ -57,4 +64,8 @@ img {
   .container {
     width: 1200px;
   }
+}
+
+button:focus {
+  outline: none;
 }

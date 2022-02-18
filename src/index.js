@@ -1,3 +1,4 @@
+import 'simplelightbox/dist/simple-lightbox.min.css';
 import './css/styles.css';
 import './css/search-field.css';
 import './css/gallery.css';
@@ -5,7 +6,6 @@ import './css/load-more.css';
 import axios from 'axios';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
 import GalleryApi from '../src/js/fetch-gallery';
 import '../src/js/header.js';
 import LoadMoreBtn from'../src/js/load-more-button';
@@ -61,7 +61,8 @@ function galleryDisplay(images) {
     const imagesHits = images.totalHits;
     let cardsDisplayed = document.querySelectorAll('div.photo-card').length;
 
-    // Throwing error on incorrect input query
+    function statements() {
+        // Throwing error on incorrect input query
     if (imagesReturned === 0) {
         throw new Error();
     }
@@ -73,7 +74,7 @@ function galleryDisplay(images) {
     }
 
     // If statement for situation when we got more than 500 hits and reached maximum of them displayed
-    if (imagesHits - cardsDisplayed < CARDS_PER_PAGE) {
+    if (cardsDisplayed + CARDS_PER_PAGE > 500) {
         Notify.info("We're sorry, but you've reached the end of search results.");
         loadMoreBtn.hide();
         images.hits = images.hits.slice(0, 20);
@@ -87,11 +88,16 @@ function galleryDisplay(images) {
     // If statement for notification with amount of hits
     if (cardsDisplayed < 1) {
         Notify.success(`Hooray! We found ${imagesHits} images.`);
+        }
     }
-        
+
+    statements();   
+    
     refs.gallery.insertAdjacentHTML('beforeend', galleryCardTpl(images));
 
     spaceBetweenNumbers();
+    simpleLightbox();
+    lazyLoad();
 }
 
 function clearGallery() {
@@ -110,6 +116,24 @@ function noSuchResult() {
     Notify.failure("Sorry, there are no images matching your search query. Please try again.");
 };
 
+function simpleLightbox() {
+    const galleryHandler = new SimpleLightbox('.photo-card a');
+    galleryHandler.on('show.simplelightbox');
+    galleryHandler.refresh();
+}
+
+function lazyLoad() {
+    const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+    
+    lazyImages.forEach(image => {
+        image.addEventListener('load', onImageLoaded, { once: true });
+    });
+    
+    function onImageLoaded(event) {
+        event.target.classList.add('appear');
+        event.target.classList.add('loaded');
+    }
+}
 
 // Adding space between numbers
 let cardsCount = 0;
@@ -143,6 +167,7 @@ function smoothScroll() {
         });
     }
 }
+
 
 
 
