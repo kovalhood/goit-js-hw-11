@@ -1,41 +1,24 @@
-// const BASE_URL = 'https://pixabay.com/api';
-// const KEY = '25716133-5af1cc1f28b9664f0c877d305';
-
-// function fetchGallery(search) {
-//     return fetch(`${BASE_URL}/?key=${KEY}&q=${search}&image_type=photo&orientation=horizontal&safesearch=true`)
-//         .then(response => {
-//         if (response.status === 404) {
-//             throw new Error(response.status);
-//             }
-//             console.log(response)
-//         return response.json();
-//     })
-// };
-
-// export default { fetchGallery };
-
-const API_KEY = '25716133-5af1cc1f28b9664f0c877d305';
-const BASE_URL = 'https://pixabay.com/api';
+import axios from 'axios';
 
 export default class GalleryApi {
   constructor() {
-    this.searchQuery = '';
+    this.API_KEY = '?key=25716133-5af1cc1f28b9664f0c877d305';
+    this.BASE_URL = 'https://pixabay.com/api/';
+    this.image_type = "image_type=photo";
+    this.orientation = "orientation=horizontal"
+    this.safesearch = "safesearch=true";
+    this.per_page = 40;
     this.page = 1;
+    this.searchQuery = '';
   }
 
-  fetchGallery() {
-    const url = `${BASE_URL}/?key=${API_KEY}&q=${this.searchQuery}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40&page=${this.page}`;
+  async fetchGallery() {
+    const searchParams = `${this.image_type}&${this.orientation}&${this.safesearch}&page=${this.page}&per_page=${this.per_page}`;
+    const dataResponse = await axios.get(`${this.BASE_URL}${this.API_KEY}&q=${this.searchQuery}&${searchParams}`);
 
-    return fetch(url)
-      .then(response => response.json())
-      .then((images) => {
-        this.incrementPage();
-        return images;
-      });
-  }
-
-  incrementPage() {
     this.page += 1;
+    
+    return dataResponse;
   }
 
   resetPage() {
